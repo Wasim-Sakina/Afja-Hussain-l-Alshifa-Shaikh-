@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Engagement Ceremony Countdown</title>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Great+Vibes&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --gold:    #C9A84C;
+    --gold2:   #E8C97A;
+    --deep:    #1A0A2E;
+    --rose:    #7D2855;
+    --cream:   #FDF6EC;
+    --light:   #F5E6D3;
+  }
+
+  body {
+    background: var(--deep);
+    font-family: 'Cormorant Garamond', serif;
+    overflow: hidden;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ── SLIDE SYSTEM ── */
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 1.2s ease;
+    padding: 24px;
+  }
+  .slide.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* shared gradient bg */
+  .slide::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 70% 60% at 50% 0%, rgba(201,168,76,0.18) 0%, transparent 70%),
+      radial-gradient(ellipse 50% 50% at 80% 80%, rgba(125,40,85,0.25) 0%, transparent 60%),
+      linear-gradient(160deg, #1A0A2E 0%, #2D0E4E 50%, #1A0A2E 100%);
+    z-index: 0;
+  }
+
+  .slide > * { position: relative; z-index: 2; }
+
+  /* ── ORNAMENT SVG ── */
+  .ornament { width: 260px; opacity: 0.55; margin-bottom: 4px; }
+  .ornament-sm { width: 180px; opacity: 0.45; }
+
+  /* ── BISMILLAH / DUA ── */
+  .bismillah {
+    font-family: 'Amiri', serif;
+    font-size: clamp(1.1rem, 3vw, 1.6rem);
+    color: var(--gold2);
+    letter-spacing: 0.06em;
+    text-align: center;
+    opacity: 0.9;
+    margin-bottom: 6px;
+  }
+
+  /* ── SLIDE 1 — COUNTDOWN ── */
+  .countdown-wrap {
+    text-align: center;
+  }
+  .event-label {
+    font-size: clamp(0.75rem, 2vw, 1rem);
+    color: var(--gold);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    margin-bottom: 18px;
+  }
+  .countdown-title {
+    font-family: 'Great Vibes', cursive;
+    font-size: clamp(2.2rem, 7vw, 4.5rem);
+    color: var(--cream);
+    line-height: 1.1;
+    margin-bottom: 28px;
+    text-shadow: 0 0 40px rgba(201,168,76,0.4);
+  }
+  .digits-row {
+    display: flex;
+    gap: clamp(12px, 3vw, 28px);
+    justify-content: center;
+    margin-bottom: 28px;
+  }
+  .digit-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  .digit {
+    background: linear-gradient(135deg, rgba(201,168,76,0.15), rgba(201,168,76,0.05));
+    border: 1.5px solid rgba(201,168,76,0.45);
+    border-radius: 8px;
+    width: clamp(64px, 14vw, 100px);
+    height: clamp(64px, 14vw, 100px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(2rem, 6vw, 3.8rem);
+    font-weight: 600;
+    color: var(--gold2);
+    font-family: 'Cormorant Garamond', serif;
+    text-shadow: 0 0 20px rgba(232,201,122,0.5);
+    position: relative;
+    overflow: hidden;
+  }
+  .digit::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0; right: 0;
+    height: 1px;
+    background: rgba(201,168,76,0.2);
+  }
+  .digit-label {
+    font-size: clamp(0.6rem, 1.5vw, 0.75rem);
+    color: var(--gold);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+  .event-date {
+    font-size: clamp(0.85rem, 2vw, 1.1rem);
+    color: var(--light);
+    letter-spacing: 0.15em;
+    opacity: 0.8;
+  }
+
+  /* ── SLIDE 2 — COUPLE ── */
+  .couple-wrap { text-align: center; }
+  .couple-label {
+    font-size: clamp(0.7rem, 2vw, 0.9rem);
+    color: var(--gold);
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+  .groom-name, .bride-name {
+    font-family: 'Great Vibes', cursive;
+    color: var(--cream);
+    line-height: 1.05;
+    text-shadow: 0 0 40px rgba(201,168,76,0.35);
+  }
+  .groom-name { font-size: clamp(2.4rem, 8vw, 5rem); }
+  .bride-name  { font-size: clamp(2.4rem, 8vw, 5rem); }
+  .and-symbol {
+    font-size: clamp(2.5rem, 7vw, 5rem);
+    color: var(--gold);
+    font-family: 'Great Vibes', cursive;
+    display: block;
+    margin: 2px 0;
+    text-shadow: 0 0 30px rgba(201,168,76,0.5);
+  }
+  .engagement-tag {
+    margin-top: 22px;
+    padding: 8px 28px;
+    border: 1px solid rgba(201,168,76,0.45);
+    border-radius: 50px;
+    font-size: clamp(0.7rem, 2vw, 0.9rem);
+    color: var(--gold2);
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    display: inline-block;
+  }
+
+  /* ── SLIDE 3 — FAMILIES ── */
+  .families-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+    width: 100%;
+    max-width: 600px;
+  }
+  .families-title {
+    font-family: 'Great Vibes', cursive;
+    font-size: clamp(1.6rem, 5vw, 2.8rem);
+    color: var(--cream);
+    text-align: center;
+    text-shadow: 0 0 30px rgba(201,168,76,0.3);
+    margin-bottom: 4px;
+  }
+  .families-row {
+    display: flex;
+    gap: 16px;
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .family-card {
+    flex: 1;
+    min-width: 140px;
+    max-width: 240px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(201,168,76,0.3);
+    border-radius: 12px;
+    padding: 16px 14px;
+    text-align: center;
+  }
+  .family-side {
+    font-size: clamp(0.6rem, 1.5vw, 0.72rem);
+    color: var(--gold);
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .parent-name {
+    font-size: clamp(0.88rem, 2.2vw, 1.08rem);
+    color: var(--cream);
+    font-weight: 600;
+    margin-bottom: 2px;
+  }
+  .parent-role {
+    font-size: clamp(0.65rem, 1.5vw, 0.78rem);
+    color: var(--gold2);
+    opacity: 0.75;
+    font-style: italic;
+    margin-bottom: 8px;
+  }
+  .dua-box {
+    width: 100%;
+    text-align: center;
+    padding: 14px 20px;
+    background: rgba(201,168,76,0.07);
+    border: 1px solid rgba(201,168,76,0.25);
+    border-radius: 10px;
+    margin-top: 4px;
+  }
+  .dua-arabic {
+    font-family: 'Amiri', serif;
+    font-size: clamp(1rem, 3vw, 1.4rem);
+    color: var(--gold2);
+    line-height: 1.8;
+    direction: rtl;
+    margin-bottom: 6px;
+  }
+  .dua-transliteration {
+    font-size: clamp(0.62rem, 1.5vw, 0.78rem);
+    color: var(--light);
+    letter-spacing: 0.04em;
+    opacity: 0.7;
+    font-style: italic;
+    margin-bottom: 4px;
+  }
+  .dua-translation {
+    font-size: clamp(0.62rem, 1.5vw, 0.78rem);
+    color: var(--gold);
+    opacity: 0.85;
+    letter-spacing: 0.02em;
+  }
+
+  /* ── NAVIGATION DOTS ── */
+  .dots {
+    position: fixed;
+    bottom: 22px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 10px;
+    z-index: 100;
+  }
+  .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: rgba(201,168,76,0.35);
+    cursor: pointer;
+    transition: background 0.3s, transform 0.3s;
+    border: 1px solid rgba(201,168,76,0.5);
+  }
+  .dot.active { background: var(--gold); transform: scale(1.3); }
+
+  /* ── NAV ARROWS ── */
+  .nav-btn {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(201,168,76,0.12);
+    border: 1px solid rgba(201,168,76,0.3);
+    color: var(--gold);
+    border-radius: 50%;
+    width: 40px; height: 40px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    display: flex; align-items: center; justify-content: center;
+    z-index: 100;
+    transition: background 0.2s;
+  }
+  .nav-btn:hover { background: rgba(201,168,76,0.25); }
+  .nav-btn.prev { left: 12px; }
+  .nav-btn.next { right: 12px; }
+
+  /* ── FLOATING PETALS ── */
+  .petal {
+    position: fixed;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0;
+    animation: fall linear infinite;
+  }
+  @keyframes fall {
+    0%   { opacity: 0; transform: translateY(-20px) rotate(0deg); }
+    10%  { opacity: 0.6; }
+    90%  { opacity: 0.3; }
+    100% { opacity: 0; transform: translateY(100vh) rotate(360deg); }
+  }
+
+  /* ── ENTRANCE ANIMATIONS ── */
+  .slide.active .bismillah     { animation: fadeUp 1s 0.2s both; }
+  .slide.active .ornament      { animation: fadeUp 1s 0.1s both; }
+  .slide.active .countdown-title { animation: fadeUp 1s 0.4s both; }
+  .slide.active .digits-row    { animation: fadeUp 1s 0.6s both; }
+  .slide.active .event-date    { animation: fadeUp 1s 0.9s both; }
+  .slide.active .couple-label  { animation: fadeUp 1s 0.2s both; }
+  .slide.active .groom-name    { animation: fadeUp 1s 0.4s both; }
+  .slide.active .and-symbol    { animation: fadeIn 1s 0.7s both; }
+  .slide.active .bride-name    { animation: fadeUp 1s 0.9s both; }
+  .slide.active .engagement-tag{ animation: fadeUp 1s 1.1s both; }
+  .slide.active .families-title{ animation: fadeUp 1s 0.2s both; }
+  .slide.active .family-card   { animation: fadeUp 1s 0.5s both; }
+  .slide.active .dua-box       { animation: fadeUp 1s 0.9s both; }
+
+  @keyframes fadeUp {
+    from { opacity:0; transform: translateY(22px); }
+    to   { opacity:1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity:0; } to { opacity:1; }
+  }
+
+  /* gold shimmer line */
+  .divider {
+    width: 140px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    margin: 10px auto;
+    opacity: 0.6;
+  }
+</style>
+</head>
+<body>
+
+<!-- ════════════════ SLIDE 1 — COUNTDOWN ════════════════ -->
+<section class="slide active" id="slide-1">
+
+  <svg class="ornament" viewBox="0 0 300 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M10 30 Q75 5 150 30 Q225 55 290 30" stroke="#C9A84C" stroke-width="1.2" fill="none"/>
+    <path d="M10 30 Q75 55 150 30 Q225 5 290 30" stroke="#C9A84C" stroke-width="0.6" fill="none" opacity=".5"/>
+    <circle cx="150" cy="30" r="5" fill="#C9A84C" opacity=".7"/>
+    <circle cx="10"  cy="30" r="3" fill="#C9A84C" opacity=".4"/>
+    <circle cx="290" cy="30" r="3" fill="#C9A84C" opacity=".4"/>
+    <path d="M135 30 Q142 20 150 15 Q158 20 165 30" stroke="#C9A84C" stroke-width="0.8" fill="none"/>
+  </svg>
+
+  <div class="bismillah">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>
+
+  <div class="countdown-wrap">
+    <div class="event-label">✦ Rasm-e-Mangni ✦</div>
+    <div class="countdown-title">Khushi Ka Din Qareeb Hai</div>
+
+    <div class="digits-row">
+      <div class="digit-box">
+        <div class="digit" id="cd-days">00</div>
+        <div class="digit-label">Days</div>
+      </div>
+      <div class="digit-box">
+        <div class="digit" id="cd-hours">00</div>
+        <div class="digit-label">Hours</div>
+      </div>
+      <div class="digit-box">
+        <div class="digit" id="cd-mins">00</div>
+        <div class="digit-label">Mins</div>
+      </div>
+      <div class="digit-box">
+        <div class="digit" id="cd-secs">00</div>
+        <div class="digit-label">Secs</div>
+      </div>
+    </div>
+
+    <div class="event-date" id="event-date-label">📅 &nbsp; 14 June 2026 &nbsp;·&nbsp; 6:00 PM</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <svg class="ornament" viewBox="0 0 300 60" fill="none" xmlns="http://www.w3.org/2000/svg" style="transform:scaleY(-1)">
+    <path d="M10 30 Q75 5 150 30 Q225 55 290 30" stroke="#C9A84C" stroke-width="1.2" fill="none"/>
+    <circle cx="150" cy="30" r="5" fill="#C9A84C" opacity=".7"/>
+    <circle cx="10"  cy="30" r="3" fill="#C9A84C" opacity=".4"/>
+    <circle cx="290" cy="30" r="3" fill="#C9A84C" opacity=".4"/>
+  </svg>
+
+</section>
+
+<!-- ════════════════ SLIDE 2 — COUPLE NAMES ════════════════ -->
+<section class="slide" id="slide-2">
+
+  <svg class="ornament" viewBox="0 0 300 60" fill="none">
+    <path d="M10 30 Q75 5 150 30 Q225 55 290 30" stroke="#C9A84C" stroke-width="1.2" fill="none"/>
+    <path d="M10 30 Q75 55 150 30 Q225 5 290 30" stroke="#C9A84C" stroke-width="0.6" fill="none" opacity=".5"/>
+    <circle cx="150" cy="30" r="5" fill="#C9A84C" opacity=".7"/>
+    <circle cx="10"  cy="30" r="3" fill="#C9A84C" opacity=".4"/>
+    <circle cx="290" cy="30" r="3" fill="#C9A84C" opacity=".4"/>
+  </svg>
+
+  <div class="bismillah">مَبَارَكٌ وَسَعِيدٌ</div>
+  <div class="divider"></div>
+
+  <div class="couple-wrap">
+    <div class="couple-label">✦ With the blessings of Allah ✦</div>
+    <div class="groom-name">Afjal Hussain</div>
+    <span class="and-symbol">&amp;</span>
+    <div class="bride-name">Alshifa Shaikh</div>
+    <div class="divider" style="margin-top:18px"></div>
+    <div class="engagement-tag">Rasm-e-Mangni Mein Bandhne Ja Rahe Hain</div>
+  </div>
+
+  <div style="margin-top:20px">
+    <svg class="ornament-sm" viewBox="0 0 200 40" fill="none">
+      <path d="M5 20 Q50 5 100 20 Q150 35 195 20" stroke="#C9A84C" stroke-width="1" fill="none"/>
+      <circle cx="100" cy="20" r="4" fill="#C9A84C" opacity=".6"/>
+      <circle cx="5"   cy="20" r="2.5" fill="#C9A84C" opacity=".35"/>
+      <circle cx="195" cy="20" r="2.5" fill="#C9A84C" opacity=".35"/>
+      <path d="M88 20 Q94 13 100 10 Q106 13 112 20" stroke="#C9A84C" stroke-width="0.8" fill="none"/>
+    </svg>
+  </div>
+
+</section>
+
+<!-- ════════════════ SLIDE 3 — FAMILIES + DUA ════════════════ -->
+<section class="slide" id="slide-3">
+
+  <div class="families-wrap">
+    <div class="bismillah" style="font-size:clamp(0.9rem,2.5vw,1.25rem)">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>
+    <div class="families-title">Apne Mohtaram Walidain Ki Duaon Ke Sath</div>
+
+    <div class="families-row">
+      <!-- GROOM SIDE -->
+      <div class="family-card">
+        <div class="family-side">🤵 Walidain-e-Dulha</div>
+        <div class="parent-name">Mr. Zakir Hussain</div>
+        <div class="parent-role">Walid-e-Dulha</div>
+        <div class="divider" style="width:60px; margin:6px auto"></div>
+        <div class="parent-name">Mrs. Shabana Bee</div>
+        <div class="parent-role">Walida-e-Dulha</div>
+      </div>
+
+      <!-- BRIDE SIDE -->
+      <div class="family-card">
+        <div class="family-side">👰 Walidain-e-Dulhan</div>
+        <div class="parent-name">Mr. Fariduddin Shaikh</div>
+        <div class="parent-role">Walid-e-Dulhan</div>
+        <div class="divider" style="width:60px; margin:6px auto"></div>
+        <div class="parent-name">Mrs. Ruksana Shaikh</div>
+        <div class="parent-role">Walida-e-Dulhan</div>
+      </div>
+    </div>
+
+    <!-- DUA -->
+    <div class="dua-box">
+      <div class="dua-arabic">
+        بَارَكَ اللَّهُ لَكَ وَبَارَكَ عَلَيْكَ وَجَمَعَ بَيْنَكُمَا فِي خَيْرٍ
+      </div>
+      <div class="dua-transliteration">
+        Bārakallāhu laka wa bāraka ʿalayka wa jamaʿa baynakumā fī khayr
+      </div>
+      <div class="dua-translation">
+        "May Allah bless you, shower blessings upon you, and unite you both in goodness."
+      </div>
+    </div>
+
+    <svg class="ornament-sm" viewBox="0 0 200 40" fill="none" style="margin-top:4px">
+      <path d="M5 20 Q50 5 100 20 Q150 35 195 20" stroke="#C9A84C" stroke-width="1" fill="none"/>
+      <circle cx="100" cy="20" r="4" fill="#C9A84C" opacity=".6"/>
+    </svg>
+
+  </div>
+</section>
+
+<!-- NAV -->
+<button class="nav-btn prev" onclick="changeSlide(-1)">&#8249;</button>
+<button class="nav-btn next" onclick="changeSlide(+1)">&#8250;</button>
+<div class="dots">
+  <div class="dot active" onclick="goSlide(0)"></div>
+  <div class="dot"        onclick="goSlide(1)"></div>
+  <div class="dot"        onclick="goSlide(2)"></div>
+</div>
+
+<!-- FLOATING PETALS -->
+<script>
+  // ── Petals
+  const petalSymbols = ['✿','❀','✾','❁','🌸'];
+  for(let i=0;i<18;i++){
+    const p = document.createElement('div');
+    p.className = 'petal';
+    p.textContent = petalSymbols[i%petalSymbols.length];
+    p.style.cssText = `
+      left:${Math.random()*100}vw;
+      font-size:${8+Math.random()*10}px;
+      color:rgba(201,168,76,${0.2+Math.random()*0.35});
+      animation-duration:${8+Math.random()*12}s;
+      animation-delay:${Math.random()*10}s;
+    `;
+    document.body.appendChild(p);
+  }
+
+  // ── Countdown
+  // Set your engagement date here ↓
+  const TARGET = new Date('2026-06-14T18:00:00');
+
+  function pad(n){ return String(n).padStart(2,'0'); }
+  function tick(){
+    const now = new Date();
+    const diff = TARGET - now;
+    if(diff <= 0){
+      document.getElementById('cd-days').textContent  = '00';
+      document.getElementById('cd-hours').textContent = '00';
+      document.getElementById('cd-mins').textContent  = '00';
+      document.getElementById('cd-secs').textContent  = '00';
+      return;
+    }
+    const d = Math.floor(diff/86400000);
+    const h = Math.floor((diff%86400000)/3600000);
+    const m = Math.floor((diff%3600000)/60000);
+    const s = Math.floor((diff%60000)/1000);
+    document.getElementById('cd-days').textContent  = pad(d);
+    document.getElementById('cd-hours').textContent = pad(h);
+    document.getElementById('cd-mins').textContent  = pad(m);
+    document.getElementById('cd-secs').textContent  = pad(s);
+  }
+  tick();
+  setInterval(tick,1000);
+
+  // Date label
+  document.getElementById('event-date-label').innerHTML =
+    '📅 &nbsp; 14 June 2026 &nbsp;·&nbsp; 6:00 PM';
+
+  // ── Slides
+  let current = 0;
+  const slides = document.querySelectorAll('.slide');
+  const dots   = document.querySelectorAll('.dot');
+  let autoTimer;
+
+  function goSlide(idx){
+    slides[current].classList.remove('active');
+    dots[current].classList.remove('active');
+    current = (idx + slides.length) % slides.length;
+    slides[current].classList.add('active');
+    dots[current].classList.add('active');
+    resetAuto();
+  }
+  function changeSlide(dir){ goSlide(current + dir); }
+
+  function resetAuto(){
+    clearInterval(autoTimer);
+    autoTimer = setInterval(()=>changeSlide(1), 7000);
+  }
+  resetAuto();
+
+  // keyboard
+  document.addEventListener('keydown', e => {
+    if(e.key==='ArrowRight') changeSlide(1);
+    if(e.key==='ArrowLeft')  changeSlide(-1);
+  });
+
+  // touch swipe
+  let tx=0;
+  document.addEventListener('touchstart',e=>tx=e.touches[0].clientX,{passive:true});
+  document.addEventListener('touchend',e=>{
+    const dx = e.changedTouches[0].clientX - tx;
+    if(Math.abs(dx)>50) changeSlide(dx<0?1:-1);
+  },{passive:true});
+</script>
+</body>
+</html>
